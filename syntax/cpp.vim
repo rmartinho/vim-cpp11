@@ -32,6 +32,7 @@ syn keyword cppAccess		public protected private
 syn keyword cppType		inline virtual explicit export bool wchar_t char16_t char32_t
 syn keyword cppExceptions	throw try catch
 syn keyword cppOperator		operator typeid noexcept move forward override final alignof decltype
+syn keyword cppOperator		EnableIf DisableIf
 syn keyword cppOperator		and bitor or xor compl bitand and_eq or_eq xor_eq not not_eq
 syn match cppCast		"\<\(const\|static\|dynamic\|reinterpret\)_cast\s*<"me=e-1
 syn match cppCast		"\<\(const\|static\|dynamic\|reinterpret\)_cast\s*$"
