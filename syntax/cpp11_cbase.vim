@@ -115,7 +115,6 @@ endif
 syn case ignore
 syn match	cNumberSep	display contained "'"
 syn match	cNumberSuffix	display contained "\I*\>"
-syn match	cFloatSuffix	display contained "f\>"
 syn match	cNumbers	display transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctalError,cOctal nextgroup=cNumberSuffix
 " Same, but without octal error (for comments)
 syn match	cNumbersCom	display contained transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctal nextgroup=cNumberSuffix
@@ -127,7 +126,6 @@ syn match	cNumber		display contained "0x\x\('\?\x\)*" contains=cNumberSep nextgr
 " Flag the first zero of an octal number as something special
 syn match	cOctal		display contained "0\('\?\o\)\+" contains=cOctalZero,cNumberSep nextgroup=cNumberSuffix
 syn match	cOctalZero	display contained "\<0"
-syn match	cFloat		display contained "\d\('\?\d\)*f\>" contains=cNumberSep,cFloatSuffix
 "floating point number, with dot, optional exponent
 syn match	cFloat		display contained "\d\('\?\d\)*\.\(\d\('\?\d\)*\)\?\(e[-+]\?\d\('\?\d\)*\)\?" contains=cNumberSep nextgroup=cNumberSuffix
 "floating point number, starting with a dot, optional exponent
@@ -346,7 +344,6 @@ hi def link cSpecialCharacter	cSpecial
 hi def link cNumber		Number
 hi def link cNumberSep		Delimiter
 hi def link cNumberSuffix	Delimiter
-hi def link cFloatSuffix	Delimiter
 hi def link cOctal		Number
 hi def link cOctalZero		PreProc	 " link this to Error if you want
 hi def link cFloat		Float
