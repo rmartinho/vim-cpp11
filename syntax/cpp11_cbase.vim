@@ -113,22 +113,25 @@ endif
 
 "integer number, or floating point number without a dot and with "f".
 syn case ignore
-syn match	cNumbers	display transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctalError,cOctal
+syn match	cNumberSep	display contained "'"
+syn match	cNumberSuffix	display contained "\I*\>"
+syn match	cFloatSuffix	display contained "f\>"
+syn match	cNumbers	display transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctalError,cOctal nextgroup=cNumberSuffix
 " Same, but without octal error (for comments)
-syn match	cNumbersCom	display contained transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctal
-syn match	cNumber		display contained "\d\+\(u\=l\{0,2}\|ll\=u\)\>"
+syn match	cNumbersCom	display contained transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctal nextgroup=cNumberSuffix
+syn match	cNumber		display contained "\d\('\?\d\)*" contains=cNumberSep nextgroup=cNumberSuffix
 "hex number
-syn match	cNumber		display contained "0x\x\+\(u\=l\{0,2}\|ll\=u\)\>"
+syn match	cNumber		display contained "0x\x\('\?\x\)*" contains=cNumberSep nextgroup=cNumberSuffix
 " Flag the first zero of an octal number as something special
-syn match	cOctal		display contained "0\o\+\(u\=l\{0,2}\|ll\=u\)\>" contains=cOctalZero
+syn match	cOctal		display contained "0\('\?\o\)\+" contains=cOctalZero,cNumberSep nextgroup=cNumberSuffix
 syn match	cOctalZero	display contained "\<0"
-syn match	cFloat		display contained "\d\+f"
+syn match	cFloat		display contained "\d\('\?\d\)*f\>" contains=cNumberSep,cFloatSuffix
 "floating point number, with dot, optional exponent
-syn match	cFloat		display contained "\d\+\.\d*\(e[-+]\=\d\+\)\=[fl]\="
+syn match	cFloat		display contained "\d\('\?\d\)*\.\(\d\('\?\d\)*\)\?\(e[-+]\?\d\('\?\d\)*\)\?" contains=cNumberSep nextgroup=cNumberSuffix
 "floating point number, starting with a dot, optional exponent
-syn match	cFloat		display contained "\.\d\+\(e[-+]\=\d\+\)\=[fl]\=\>"
+syn match	cFloat		display contained "\.\d\('\?\d\)*\(e[-+]\?\d\('\?\d\)*\)\?" contains=cNumberSep nextgroup=cNumberSuffix
 "floating point number, without dot, with exponent
-syn match	cFloat		display contained "\d\+e[-+]\=\d\+[fl]\=\>"
+syn match	cFloat		display contained "\d\('\?\d\)*e[-+]\?\d\('\?\d\)" contains=cNumberSep nextgroup=cNumberSuffix
 if !exists("c_no_c99")
   "hexadecimal floating point number, optional leading digits, with dot, with exponent
   syn match	cFloat		display contained "0x\x*\.\x\+p[-+]\=\d\+[fl]\=\>"
@@ -137,7 +140,7 @@ if !exists("c_no_c99")
 endif
 
 " flag an octal number with wrong digits
-syn match	cOctalError	display contained "0\o*[89]\d*"
+syn match	cOctalError	display contained "0\('\?\o\)*'\?[89]\('\?\d\)*" contains=cNumberSep nextgroup=cNumberSuffix
 syn case match
 
 if exists("c_comment_strings")
@@ -339,6 +342,9 @@ hi def link cRepeat		Repeat
 hi def link cCharacter		Character
 hi def link cSpecialCharacter	cSpecial
 hi def link cNumber		Number
+hi def link cNumberSep		Delimiter
+hi def link cNumberSuffix	Delimiter
+hi def link cFloatSuffix	Delimiter
 hi def link cOctal		Number
 hi def link cOctalZero		PreProc	 " link this to Error if you want
 hi def link cFloat		Float
