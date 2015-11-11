@@ -120,6 +120,8 @@ syn match	cNumbers	display transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOct
 " Same, but without octal error (for comments)
 syn match	cNumbersCom	display contained transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctal nextgroup=cNumberSuffix
 syn match	cNumber		display contained "\d\('\?\d\)*" contains=cNumberSep nextgroup=cNumberSuffix
+"binary number
+syn match	cNumber		display contained "0b[01]\('\?[01]\)*" contains=cNumberSep nextgroup=cNumberSuffix
 "hex number
 syn match	cNumber		display contained "0x\x\('\?\x\)*" contains=cNumberSep nextgroup=cNumberSuffix
 " Flag the first zero of an octal number as something special
