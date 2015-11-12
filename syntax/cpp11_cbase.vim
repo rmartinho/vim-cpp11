@@ -114,7 +114,7 @@ endif
 "integer number, or floating point number without a dot and with "f".
 syn case ignore
 syn match	cNumberSep	display contained "'"
-syn match	cNumberSuffix	display contained "\I*\>"
+syn match	cNumberSuffix	display contained "\%(\I\i*\)\?\>"
 syn match	cNumbers	display transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctalError,cOctal nextgroup=cNumberSuffix
 " Same, but without octal error (for comments)
 syn match	cNumbersCom	display contained transparent "\<\d\|\.\d" contains=cNumber,cFloat,cOctal nextgroup=cNumberSuffix
