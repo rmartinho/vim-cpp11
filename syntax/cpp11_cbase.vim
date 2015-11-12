@@ -36,8 +36,8 @@ syn match	cSpecial	display contained "\\\(x\x\+\|\o\{1,3}\|.\|$\)"
 if !exists("c_no_utf")
   syn match	cSpecial	display contained "\\\(u\x\{4}\|U\x\{8}\)"
 endif
-syn match	cppStrPrefix	display $\(L\|u8\|u\|U\)\?\ze"$ nextgroup=cString
 syn match	cCppStrPrefix	display $\(L\|u8\|u\|U\)\?\ze"$ nextgroup=cCppString
+syn match	cppStrPrefix	display $\(L\|u8\|u\|U\)\?\ze"$ nextgroup=cString,cCppString
 if exists("c_no_cformat")
   syn region	cString		contained start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=cSpecial,@Spell nextgroup=cppTextSuffix
   " cCppString: same as cString, but ends at end of line
@@ -54,18 +54,19 @@ else
   syn region	cCppString	contained start=+"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end='$' contains=cSpecial,cFormat,@Spell nextgroup=cppTextSuffix
 endif
 
-syn match	cCharacter	"L\='[^\\]'"
-syn match	cCharacter	"L'[^']*'" contains=cSpecial
+syn match	cCharPrefixStrict display "\(L\|u8\|u\|U\)\?\ze'" nextgroup=cCharacter
+syn match	cCharPrefix	display "\(L\|u8\|u\|U\)\?\ze'" nextgroup=cCharacter,cSpecialError,cSpecialCharacter
+syn match	cCharacter	contained "'[^\\]'" nextgroup=cppTextSuffix
+syn match	cCharacter	contained "'[^']*'" contains=cSpecial nextgroup=cppTextSuffix
 if exists("c_gnu")
-  syn match	cSpecialError	"L\='\\[^'\"?\\abefnrtv]'"
-  syn match	cSpecialCharacter "L\='\\['\"?\\abefnrtv]'"
+  syn match	cSpecialError	contained "'\\[^'\"?\\abefnrtv]'" nextgroup=cppTextSuffix
+  syn match	cSpecialCharacter contained "'\\['\"?\\abefnrtv]'" nextgroup=cppTextSuffix
 else
-  syn match	cSpecialError	"L\='\\[^'\"?\\abfnrtv]'"
-  syn match	cSpecialCharacter "L\='\\['\"?\\abfnrtv]'"
+  syn match	cSpecialError	contained "'\\[^'\"?\\abfnrtv]'" nextgroup=cppTextSuffix
+  syn match	cSpecialCharacter contained "'\\['\"?\\abfnrtv]'" nextgroup=cppTextSuffix
 endif
-syn match	cSpecialCharacter display "L\='\\\o\{1,3}'"
-syn match	cSpecialCharacter display "'\\x\x\{1,2}'"
-syn match	cSpecialCharacter display "L'\\x\x\+'"
+syn match	cSpecialCharacter contained display "'\\\o\{1,3}'" nextgroup=cppTextSuffix
+syn match	cSpecialCharacter contained display "'\\x\x\+'" nextgroup=cppTextSuffix
 
 syn match	cppTextSuffix	display contained $["']\@<=\I\i*\>$
 
@@ -156,13 +157,13 @@ if exists("c_comment_strings")
   syntax match	cCommentSkip	contained "^\s*\*\($\|\s\+\)"
   syntax region cCommentString	contained start=+L\=\\\@<!"+ skip=+\\\\\|\\"+ end=+"+ end=+\*/+me=s-1 contains=cSpecial,cCommentSkip
   syntax region cComment2String	contained start=+L\=\\\@<!"+ skip=+\\\\\|\\"+ end=+"+ end="$" contains=cSpecial
-  syntax region  cCommentL	start="//" skip="\\$" end="$" keepend contains=@cCommentGroup,cComment2String,cCharacter,cNumbersCom,cSpaceError,@Spell
+  syntax region  cCommentL	start="//" skip="\\$" end="$" keepend contains=@cCommentGroup,cComment2String,cCharPrefixStrict,cNumbersCom,cSpaceError,@Spell
   if exists("c_no_comment_fold")
     " Use "extend" here to have preprocessor lines not terminate halfway a
     " comment.
-    syntax region cComment	matchgroup=cCommentStart start="/\*" end="\*/" contains=@cCommentGroup,cCommentStartError,cCommentString,cCharacter,cNumbersCom,cSpaceError,@Spell extend
+    syntax region cComment	matchgroup=cCommentStart start="/\*" end="\*/" contains=@cCommentGroup,cCommentStartError,cCommentString,cCharPrefixStrict,cNumbersCom,cSpaceError,@Spell extend
   else
-    syntax region cComment	matchgroup=cCommentStart start="/\*" end="\*/" contains=@cCommentGroup,cCommentStartError,cCommentString,cCharacter,cNumbersCom,cSpaceError,@Spell fold extend
+    syntax region cComment	matchgroup=cCommentStart start="/\*" end="\*/" contains=@cCommentGroup,cCommentStartError,cCommentString,cCharPrefixStrict,cNumbersCom,cSpaceError,@Spell fold extend
   endif
 else
   syn region	cCommentL	start="//" skip="\\$" end="$" keepend contains=@cCommentGroup,cSpaceError,@Spell
@@ -283,7 +284,7 @@ if !exists("c_no_c99") " ISO C99
 endif
 
 " Accept %: for # (C99)
-syn region      cPreCondit      start="^\s*\(%:\|#\)\s*\(if\|ifdef\|ifndef\|elif\)\>" skip="\\$" end="$"  keepend contains=cComment,cCommentL,cCppStrPrefix,cCharacter,cCppParen,cParenError,cNumbers,cCommentError,cSpaceError
+syn region      cPreCondit      start="^\s*\(%:\|#\)\s*\(if\|ifdef\|ifndef\|elif\)\>" skip="\\$" end="$"  keepend contains=cComment,cCommentL,cCppStrPrefix,cCharPrefixStrict,cCppParen,cParenError,cNumbers,cCommentError,cSpaceError
 syn match	cPreCondit	display "^\s*\(%:\|#\)\s*\(else\|endif\)\>"
 if !exists("c_no_if0")
   if !exists("c_no_if0_fold")
@@ -303,7 +304,7 @@ syn region	cDefine		start="^\s*\(%:\|#\)\s*\(define\|undef\)\>" skip="\\$" end="
 syn region	cPreProc	start="^\s*\(%:\|#\)\s*\(pragma\>\|line\>\|warning\>\|warn\>\|error\>\)" skip="\\$" end="$" keepend contains=ALLBUT,@cPreProcGroup,@Spell
 
 " Highlight User Labels
-syn cluster	cMultiGroup	contains=cIncluded,cSpecial,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cUserCont,cUserLabel,cBitField,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cCppParen,cCppBracket,cCppStrPrefix
+syn cluster	cMultiGroup	contains=cIncluded,cSpecial,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cUserCont,cUserLabel,cBitField,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cCppParen,cCppBracket,cppIdentifier,cCppStrPrefix
 syn region	cMulti		transparent start='?' skip='::' end=':' contains=ALLBUT,@cMultiGroup,@Spell
 " Avoid matching foo::bar() in C++ by requiring that the next char is not ':'
 syn cluster	cLabelGroup	contains=cUserLabel
@@ -336,8 +337,9 @@ endif
 " Define the default highlighting.
 " Only used when an item doesn't have highlighting yet
 hi def link cFormat		cSpecial
-hi def link cppStrPrefix	PreProc
-hi def link cCppStrPrefix	PreProc
+hi def link cppEncodingPrefix	Delimiter
+hi def link cppStrPrefix	cppEncodingPrefix
+hi def link cCppStrPrefix	cppEncodingPrefix
 hi def link cppTextSuffix	Delimiter
 hi def link cCppString		cString
 hi def link cCommentL		cComment
@@ -346,6 +348,8 @@ hi def link cLabel		Label
 hi def link cUserLabel		Label
 hi def link cConditional	Conditional
 hi def link cRepeat		Repeat
+hi def link cCharPrefix		cppEncodingPrefix
+hi def link cCharPrefixStrict	cppEncodingPrefix
 hi def link cCharacter		Character
 hi def link cSpecialCharacter	cSpecial
 hi def link cNumber		Number
