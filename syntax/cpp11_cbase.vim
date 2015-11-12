@@ -36,10 +36,12 @@ syn match	cSpecial	display contained "\\\(x\x\+\|\o\{1,3}\|.\|$\)"
 if !exists("c_no_utf")
   syn match	cSpecial	display contained "\\\(u\x\{4}\|U\x\{8}\)"
 endif
+syn match	cppTextPrefix	display $\(L\|u8\|u\|U\)\?\ze"$ nextgroup=cString,cCppString
+syn match	cppTextSuffix	display contained $["']\@<=\I\i*\>$
 if exists("c_no_cformat")
-  syn region	cString		start=+L\="+ skip=+\\\\\|\\"+ end=+"+ contains=cSpecial,@Spell
+  syn region	cString		contained start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=cSpecial,@Spell nextgroup=cppTextSuffix
   " cCppString: same as cString, but ends at end of line
-  syn region	cCppString	start=+L\="+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end='$' contains=cSpecial,@Spell
+  syn region	cCppString	contained start=+"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end='$' contains=cSpecial,@Spell nextgroup=cppTextSuffix
 else
   if !exists("c_no_c99") " ISO C99
     syn match	cFormat		display "%\(\d\+\$\)\=[-+' #0*]*\(\d*\|\*\|\*\d\+\$\)\(\.\(\d*\|\*\|\*\d\+\$\)\)\=\([hlLjzt]\|ll\|hh\)\=\([aAbdiuoxXDOUfFeEgGcCsSpn]\|\[\^\=.[^]]*\]\)" contained
@@ -47,9 +49,9 @@ else
     syn match	cFormat		display "%\(\d\+\$\)\=[-+' #0*]*\(\d*\|\*\|\*\d\+\$\)\(\.\(\d*\|\*\|\*\d\+\$\)\)\=\([hlL]\|ll\)\=\([bdiuoxXDOUfeEgGcCsSpn]\|\[\^\=.[^]]*\]\)" contained
   endif
   syn match	cFormat		display "%%" contained
-  syn region	cString		start=+L\="+ skip=+\\\\\|\\"+ end=+"+ contains=cSpecial,cFormat,@Spell
+  syn region	cString		contained start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=cSpecial,cFormat,@Spell nextgroup=cppTextSuffix
   " cCppString: same as cString, but ends at end of line
-  syn region	cCppString	start=+L\="+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end='$' contains=cSpecial,cFormat,@Spell
+  syn region	cCppString	contained start=+"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end='$' contains=cSpecial,cFormat,@Spell nextgroup=cppTextSuffix
 endif
 
 syn match	cCharacter	"L\='[^\\]'"
@@ -332,6 +334,8 @@ endif
 " Define the default highlighting.
 " Only used when an item doesn't have highlighting yet
 hi def link cFormat		cSpecial
+hi def link cppTextPrefix	PreProc
+hi def link cppTextSuffix	Delimiter
 hi def link cCppString		cString
 hi def link cCommentL		cComment
 hi def link cCommentStart	cComment
