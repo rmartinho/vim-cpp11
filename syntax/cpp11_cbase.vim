@@ -54,6 +54,11 @@ else
   syn region	cCppString	contained start=+"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end='$' contains=cSpecial,cFormat,@Spell nextgroup=cppTextSuffix
 endif
 
+syn match	cppRawPrefix	display $\(L\|u8\|u\|U\)\?\zeR"[a-zA-Z0-9_{}[\]#<>%:;.?*+\-/^&|~!=,"']*($ nextgroup=cppRawStart
+syn match	cppRawStart	display contained $R"\ze[a-zA-Z0-9_{}[\]#<>%:;.?*+\-/^&|~!=,"']*($ nextgroup=cppRawString
+syn region      cppRawString	display contained matchgroup=cppRawDelimiter start=$\z([a-zA-Z0-9_{}[\]#<>%:;.?*+\-/^&|~!=,"']*\)\ze($ end=$)\zs\z1\ze"$ contains=@Spell nextgroup=cppRawEnd
+syn match	cppRawEnd	+"+ nextgroup=cppTextSuffix
+
 syn match	cCharPrefixStrict display "\(L\|u8\|u\|U\)\?\ze'" nextgroup=cCharacter
 syn match	cCharPrefix	display "\(L\|u8\|u\|U\)\?\ze'" nextgroup=cCharacter,cSpecialError,cSpecialCharacter
 syn match	cCharacter	contained "'[^\\]'" nextgroup=cppTextSuffix
@@ -91,7 +96,7 @@ endif
 "catch errors caused by wrong parenthesis and brackets
 " also accept <% for {, %> for }, <: for [ and :> for ] (C99)
 " But avoid matching <::.
-syn cluster	cParenGroup	contains=cParenError,cIncluded,cSpecial,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cUserCont,cUserLabel,cBitField,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cppIdentifier
+syn cluster	cParenGroup	contains=cParenError,cIncluded,cSpecial,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cUserCont,cUserLabel,cBitField,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cppIdentifier,cppRawStart,cppRawString,cppRawEnd
 if exists("c_no_curly_error")
   syn region	cParen		transparent start='(' end=')' contains=ALLBUT,@cParenGroup,cCppParen,cCppStrPrefix,@Spell
   " cCppParen: same as cParen but ends at end-of-line; used in cDefine
@@ -299,12 +304,12 @@ syn region	cIncluded	display contained start=+"+ skip=+\\\\\|\\"+ end=+"+
 syn match	cIncluded	display contained "<[^>]*>"
 syn match	cInclude	display "^\s*\(%:\|#\)\s*include\>\s*["<]" contains=cIncluded
 "syn match cLineSkip	"\\$"
-syn cluster	cPreProcGroup	contains=cPreCondit,cIncluded,cInclude,cDefine,cErrInParen,cErrInBracket,cUserLabel,cSpecial,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cppStrPrefix,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cParen,cBracket,cMulti,cppIdentifier
+syn cluster	cPreProcGroup	contains=cPreCondit,cIncluded,cInclude,cDefine,cErrInParen,cErrInBracket,cUserLabel,cSpecial,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cppStrPrefix,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cParen,cBracket,cMulti,cppIdentifier,cppRawStart,cppRawString,cppRawEnd
 syn region	cDefine		start="^\s*\(%:\|#\)\s*\(define\|undef\)\>" skip="\\$" end="$" keepend contains=ALLBUT,@cPreProcGroup,@Spell
 syn region	cPreProc	start="^\s*\(%:\|#\)\s*\(pragma\>\|line\>\|warning\>\|warn\>\|error\>\)" skip="\\$" end="$" keepend contains=ALLBUT,@cPreProcGroup,@Spell
 
 " Highlight User Labels
-syn cluster	cMultiGroup	contains=cIncluded,cSpecial,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cUserCont,cUserLabel,cBitField,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cCppParen,cCppBracket,cppIdentifier,cCppStrPrefix
+syn cluster	cMultiGroup	contains=cIncluded,cSpecial,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cUserCont,cUserLabel,cBitField,cOctalZero,cCppOut,cCppOut2,cCppSkip,cFormat,cNumberSep,cNumberSuffix,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cCppParen,cCppBracket,cppIdentifier,cCppStrPrefix,cppRawStart,cppRawString,cppRawEnd
 syn region	cMulti		transparent start='?' skip='::' end=':' contains=ALLBUT,@cMultiGroup,@Spell
 " Avoid matching foo::bar() in C++ by requiring that the next char is not ':'
 syn cluster	cLabelGroup	contains=cUserLabel
@@ -340,6 +345,12 @@ hi def link cFormat		cSpecial
 hi def link cppEncodingPrefix	Delimiter
 hi def link cppStrPrefix	cppEncodingPrefix
 hi def link cCppStrPrefix	cppEncodingPrefix
+hi def link cppRawPrefix	cppEncodingPrefix
+hi def link cppRawEnds		cString
+hi def link cppRawDelimiter	cppIdentifier
+hi def link cppRawStart		cppRawEnds
+hi def link cppRawString        cString
+hi def link cppRawEnd		cppRawEnds
 hi def link cppTextSuffix	Delimiter
 hi def link cCppString		cString
 hi def link cCommentL		cComment
