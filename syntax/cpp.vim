@@ -27,12 +27,15 @@ else
 endif
 
 " C++ extentions
+syn match cppIdentifier		"\<\I\i*\>" contained
 syn keyword cppStatement	delete this new friend using constexpr
 syn keyword cppAccess		public protected private
 syn keyword cppType		inline virtual explicit export bool wchar_t char16_t char32_t
 syn keyword cppExceptions	throw try catch
 syn match cppRequires		"requires\ze\s*(\@!"
-syn keyword cppOperator		operator typeid noexcept move forward override final alignof decltype
+syn keyword cppOperator		typeid noexcept move forward override final alignof decltype
+syn match cppOperator		+operator"\@!+
+syn match cppLitOp		+operator""\ze\I\i*\>+ nextgroup=cppIdentifier
 syn keyword cppOperator		EnableIf DisableIf
 syn keyword cppOperator		assert static_assert
 syn keyword cppOperator		and bitor or xor compl bitand and_eq or_eq xor_eq not not_eq
@@ -55,12 +58,14 @@ if version >= 508 || !exists("did_cpp_syntax_inits")
   else
     command -nargs=+ HiLink hi def link <args>
   endif
+  HiLink cppIdentifier	        Identifier
   HiLink cppAccess		cppStatement
   HiLink cppCast		cppStatement
   HiLink cppExceptions		Exception
   HiLink cppRequires		Conditional
   HiLink cppOperator		Operator
   HiLink cppRequiresOp		Operator
+  HiLink cppLitOp	        cppOperator
   HiLink cppStatement		Statement
   HiLink cppType		Type
   HiLink cppStorageClass	StorageClass
