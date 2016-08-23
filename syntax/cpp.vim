@@ -32,16 +32,16 @@ syn keyword cppStatement	delete this new friend using constexpr
 syn keyword cppAccess		public protected private
 syn keyword cppType		inline virtual explicit export bool wchar_t char16_t char32_t
 syn keyword cppExceptions	throw try catch
-syn match cppRequires		"requires\ze\s*(\@!"
+syn match cppRequires		"\<requires\>\ze\s*(\@!"
 syn keyword cppOperator		typeid noexcept move forward override final alignof decltype
-syn match cppOperator		+operator"\@!+
-syn match cppLitOp		+operator""\ze\I\i*\>+ nextgroup=cppIdentifier
+syn match cppOperator		+\<operator\>"\@!+
+syn match cppLitOp		+\<operator""\ze\I\i*\>+ nextgroup=cppIdentifier
 syn keyword cppOperator		EnableIf DisableIf
 syn keyword cppOperator		assert static_assert
 syn keyword cppOperator		and bitor or xor compl bitand and_eq or_eq xor_eq not not_eq
 syn match cppCast		"\<\(const\|static\|dynamic\|reinterpret\)_cast\s*<"me=e-1
 syn match cppCast		"\<\(const\|static\|dynamic\|reinterpret\)_cast\s*$"
-syn match cppRequiresOp		"requires\ze\s*("
+syn match cppRequiresOp		"\<requires\ze\s*("
 syn keyword cppStorageClass	mutable thread_local
 syn keyword cppStructure	class typename template namespace concept
 syn keyword cppNumber		NPOS
