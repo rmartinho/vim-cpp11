@@ -56,7 +56,7 @@ endif
 
 syn match	cppRawPrefix	display $\(L\|u8\|u\|U\)\?\zeR"[a-zA-Z0-9_{}[\]#<>%:;.?*+\-/^&|~!=,"']*($ nextgroup=cppRawStart
 syn match	cppRawStart	display contained $R"\ze[a-zA-Z0-9_{}[\]#<>%:;.?*+\-/^&|~!=,"']*($ nextgroup=cppRawString
-syn region      cppRawString	display contained matchgroup=cppRawDelimiter start=$\z([a-zA-Z0-9_{}[\]#<>%:;.?*+\-/^&|~!=,"']*\)\ze($ end=$)\zs\z1\ze"$ contains=@Spell nextgroup=cppRawEnd
+syn region      cppRawString	display contained matchgroup=cppRawDelimiter start=$\z([a-zA-Z0-9_{}[\]#<>%:;.?*+\-/^&|~!=,"']*\)($ end=$)\z1\ze"$ contains=@Spell nextgroup=cppRawEnd
 syn match	cppRawEnd	display contained +"+ nextgroup=cppTextSuffix
 
 syn match	cCharPrefixStrict display "\(L\|u8\|u\|U\)\?\ze'" nextgroup=cCharacter
